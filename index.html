@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillCraft Quiz - Interactive Trivia Challenge</title>
+  <meta name="description" content="An interactive, beautiful, and educational quiz application. Test your knowledge in Web Development, Science, and Trivia!">
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons for premium visual experience (via CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+
+  <main class="app-container">
+    <!-- Header / Branding -->
+    <header class="app-header">
+      <div class="logo">
+        <i data-lucide="zap" class="logo-icon"></i>
+        <span>SkillCraft <span class="accent-text">Quiz</span></span>
+      </div>
+    </header>
+
+    <!-- 1. Home / Welcome Screen -->
+    <section id="screen-home" class="screen active">
+      <div class="welcome-card card">
+        <div class="card-hero">
+          <i data-lucide="brain-circuit" class="hero-icon animated-bounce"></i>
+          <h1>Test Your Knowledge</h1>
+          <p>Challenge yourself with dynamic, interactive quiz categories. Select your settings below to begin!</p>
+        </div>
+
+        <form id="quiz-setup-form" onsubmit="event.preventDefault();">
+          <!-- User Profile input -->
+          <div class="form-group">
+            <label for="player-name">
+              <i data-lucide="user"></i> Enter Your Name
+            </label>
+            <input type="text" id="player-name" placeholder="E.g., Guest Genius" autocomplete="off" required>
+          </div>
+
+          <!-- Category Grid Selectors -->
+          <div class="form-group">
+            <label><i data-lucide="layers"></i> Choose Category</label>
+            <div class="category-grid">
+              <div class="category-option active" data-category="web-dev">
+                <div class="cat-icon"><i data-lucide="code-2"></i></div>
+                <div class="cat-info">
+                  <h3>Web Development</h3>
+                  <p>HTML, CSS, JS, React</p>
+                </div>
+              </div>
+              <div class="category-option" data-category="science">
+                <div class="cat-icon"><i data-lucide="atom"></i></div>
+                <div class="cat-info">
+                  <h3>Science & Space</h3>
+                  <p>Physics, Astronomy, Tech</p>
+                </div>
+              </div>
+              <div class="category-option" data-category="general">
+                <div class="cat-icon"><i data-lucide="globe"></i></div>
+                <div class="cat-info">
+                  <h3>General Trivia</h3>
+                  <p>History, Arts, World Facts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Difficulty Selectors -->
+          <div class="form-group">
+            <label><i data-lucide="gauge"></i> Choose Difficulty</label>
+            <div class="difficulty-selector">
+              <button type="button" class="diff-btn active" data-difficulty="easy">Easy</button>
+              <button type="button" class="diff-btn" data-difficulty="medium">Medium</button>
+              <button type="button" class="diff-btn" data-difficulty="hard">Hard</button>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button type="submit" id="start-quiz-btn" class="btn btn-primary btn-block">
+            <span>Start Challenge</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. Quiz Active Screen -->
+    <section id="screen-quiz" class="screen">
+      <!-- Quiz Header / HUD -->
+      <div class="quiz-hud">
+        <div class="hud-item progress-indicator">
+          <span class="hud-label">Question</span>
+          <span class="hud-value" id="current-question-num">1/10</span>
+        </div>
+        
+        <!-- Animated Timer -->
+        <div class="hud-item timer-widget">
+          <svg class="timer-circle-svg" viewBox="0 0 36 36">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="circle-progress" id="timer-stroke" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <span id="timer-sec" class="timer-val">20</span>
+        </div>
+
+        <div class="hud-item score-indicator">
+          <span class="hud-label">Score</span>
+          <span class="hud-value" id="live-score">0</span>
+        </div>
+      </div>
+
+      <!-- Main Quiz Card -->
+      <div class="quiz-card card" id="quiz-question-card">
+        <!-- Progress bar line -->
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="question-progress-fill" style="width: 10%;"></div>
+        </div>
+
+        <!-- Question type tag -->
+        <div class="question-meta">
+          <span class="question-type-tag" id="question-type-tag">Multiple Choice</span>
+          <span class="difficulty-tag" id="question-difficulty-tag">Easy</span>
+        </div>
+
+        <!-- Question Text -->
+        <h2 id="question-text" class="question-text">Loading question...</h2>
+
+        <!-- Interactive Options Container -->
+        <div id="options-container" class="options-container">
+          <!-- Dynamic buttons/inputs will render here -->
+        </div>
+
+        <!-- Feedback & Explanations Panel -->
+        <div id="feedback-panel" class="feedback-panel hidden">
+          <div class="feedback-icon-wrapper">
+            <i id="feedback-icon" data-lucide="check"></i>
+          </div>
+          <div class="feedback-details">
+            <h4 id="feedback-title">Correct!</h4>
+            <p id="feedback-text">Explanation goes here...</p>
+          </div>
+        </div>
+
+        <!-- Action Area (Submit or Next Button) -->
+        <div class="quiz-actions">
+          <button id="submit-answer-btn" class="btn btn-primary hidden">
+            <span>Submit Answer</span>
+            <i data-lucide="check-circle"></i>
+          </button>
+          <button id="next-question-btn" class="btn btn-primary btn-accent hidden">
+            <span>Next Question</span>
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Results Screen -->
+    <section id="screen-results" class="screen">
+      <div class="results-card card">
+        <div class="results-header">
+          <div class="badge-showcase">
+            <div class="badge-ring">
+              <i id="result-badge-icon" data-lucide="trophy" class="badge-icon"></i>
+            </div>
+          </div>
+          <h1 id="result-title">Amazing Job!</h1>
+          <p class="congrats-message">Congratulations, <strong id="result-username">Player</strong>!</p>
+        </div>
+
+        <!-- Score metrics -->
+        <div class="results-metrics">
+          <div class="metric-box">
+            <span class="metric-value" id="result-score-percent">80%</span>
+            <span class="metric-label">Accuracy</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-value" id="result-score-fraction">8/10</span>
+            <span class="metric-label">Score</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-value" id="result-time-taken">1:45</span>
+            <span class="metric-label">Total Time</span>
+          </div>
+        </div>
+
+        <!-- Performance Summary Card -->
+        <div class="performance-summary">
+          <h3>Your Achievements</h3>
+          <p id="performance-feedback-msg">You've mastered web technologies! Continue practicing to reach a perfect score.</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="results-actions">
+          <button id="retry-quiz-btn" class="btn btn-primary">
+            <i data-lucide="rotate-ccw"></i>
+            <span>Try Again</span>
+          </button>
+          <button id="home-quiz-btn" class="btn btn-secondary">
+            <i data-lucide="home"></i>
+            <span>Back to Home</span>
+          </button>
+        </div>
+
+        <!-- Question Review Accordion -->
+        <div class="review-section">
+          <h2>Detailed Answers Review</h2>
+          <div class="review-list" id="review-list-container">
+            <!-- Dynamic review templates go here -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Powered by <a href="#" target="_blank" rel="noopener">SkillCraft Technology</a> &copy; 2026</p>
+  </footer>
+
+  <!-- Core JavaScript -->
+  <script src="app.js"></script>
+  <!-- Initialize icons after rendering -->
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
